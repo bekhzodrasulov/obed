@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Обед — домашние обеды в офис</title>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #eef5ee;
+      --surf: #fff;
+      --ink: #12261a;
+      --mute: #5d7565;
+      --line: #dbe8dc;
+      --g1: #0f7a3d;
+      --g2: #1fa354;
+      --g3: #dff3e5;
+      --warn: #e9a020;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px)
+    }
+
+    @media(prefers-color-scheme:dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #0d1a12;
+        --surf: #15271b;
+        --ink: #e6f3ea;
+        --mute: #8fae9a;
+        --line: #24402d;
+        --g1: #2fbf6a;
+        --g2: #27a75d;
+        --g3: #1b3a27
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      font-family: Onest, system-ui, -apple-system, "Segoe UI", Arial, sans-serif
+    }
+
+    html,
+    body {
+      height: 100%
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      display: flex;
+      justify-content: center;
+      align-items: center
+    }
+
+    button {
+      cursor: pointer;
+      border: 0;
+      background: none;
+      color: inherit;
+      font-size: inherit
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible {
+      outline: 2px solid var(--g2);
+      outline-offset: 2px
+    }
+
+    #app {
+      width: 100%;
+      max-width: 430px;
+      height: 100%;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden
+    }
+
+    @media(min-width:600px) {
+      #app {
+        height: min(860px, 94%);
+        border-radius: 32px;
+        border: 1px solid var(--line);
+        box-shadow: 0 20px 60px rgba(15, 122, 61, .18)
+      }
+    }
+
+    header {
+      background: var(--g1);
+      color: #fff;
+      padding: 14px 16px 16px;
+      border-radius: 0 0 22px 22px
+    }
+
+    .loc {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      text-align: left;
+      color: #fff
+    }
+
+    .loc b {
+      display: block;
+      font-size: 15px
+    }
+
+    .loc small {
+      opacity: .8;
+      font-size: 12px
+    }
+
+    .seg {
+      display: flex;
+      background: rgba(255, 255, 255, .18);
+      border-radius: 14px;
+      padding: 3px;
+      margin-top: 12px
+    }
+
+    .seg button {
+      flex: 1;
+      padding: 9px;
+      border-radius: 11px;
+      font-weight: 600;
+      color: #fff
+    }
+
+    .seg button.on {
+      background: #fff;
+      color: var(--g1)
+    }
+
+    main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 16px 90px
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px
+    }
+
+    .chip {
+      padding: 8px 14px;
+      border-radius: 20px;
+      background: var(--surf);
+      border: 1px solid var(--line);
+      font-weight: 500;
+      white-space: nowrap
+    }
+
+    .chip.on {
+      background: var(--g3);
+      border-color: var(--g2);
+      color: var(--g1);
+      font-weight: 600
+    }
+
+    .card {
+      background: var(--surf);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      margin-bottom: 12px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      width: 100%;
+      text-align: left
+    }
+
+    .ava {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: var(--g3);
+      display: grid;
+      place-items: center;
+      font-size: 26px;
+      flex: none
+    }
+
+    .card h3 {
+      font-size: 16px
+    }
+
+    .card p {
+      color: var(--mute);
+      font-size: 13px;
+      margin-top: 2px
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 8px;
+      background: var(--g3);
+      color: var(--g1);
+      font-weight: 600;
+      margin-top: 6px
+    }
+
+    h2 {
+      font-size: 20px;
+      margin-bottom: 4px
+    }
+
+    .sub {
+      color: var(--mute);
+      font-size: 14px;
+      margin-bottom: 14px
+    }
+
+    .back {
+      color: var(--g1);
+      font-weight: 600;
+      margin-bottom: 10px
+    }
+
+    .item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line)
+    }
+
+    .item:last-child {
+      border: 0
+    }
+
+    .item>div:first-child {
+      flex: 1
+    }
+
+    .item b {
+      font-size: 15px
+    }
+
+    .item small {
+      color: var(--mute);
+      display: block
+    }
+
+    .qty {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .qty button {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: var(--g1);
+      color: #fff;
+      font-weight: 700;
+      font-size: 18px
+    }
+
+    .qty button.min {
+      background: var(--g3);
+      color: var(--g1)
+    }
+
+    .btn {
+      background: var(--g1);
+      color: #fff;
+      font-weight: 700;
+      padding: 14px;
+      border-radius: 16px;
+      width: 100%;
+      font-size: 16px
+    }
+
+    .btn.alt {
+      background: var(--g3);
+      color: var(--g1)
+    }
+
+    .bar {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 78px
+    }
+
+    nav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--surf);
+      border-top: 1px solid var(--line);
+      display: flex;
+      padding: 8px 8px calc(8px + env(safe-area-inset-bottom, 0px))
+    }
+
+    nav button {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      font-size: 12px;
+      color: var(--mute);
+      padding: 4px;
+      position: relative
+    }
+
+    nav button span {
+      font-size: 22px
+    }
+
+    nav button.on {
+      color: var(--g1);
+      font-weight: 700
+    }
+
+    .dot {
+      position: absolute;
+      top: 0;
+      right: 28%;
+      background: var(--warn);
+      color: #000;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 10px;
+      padding: 0 6px
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      color: var(--mute);
+      margin: 12px 0 4px
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: var(--surf);
+      color: var(--ink);
+      font-size: 15px
+    }
+
+    .sheet {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, .45);
+      display: flex;
+      align-items: flex-end;
+      z-index: 5
+    }
+
+    .sheet>div {
+      background: var(--bg);
+      width: 100%;
+      border-radius: 24px 24px 0 0;
+      padding: 20px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+      max-height: 90%;
+      overflow: auto
+    }
+
+    .sum {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0
+    }
+
+    .sum.t {
+      font-weight: 700;
+      font-size: 17px;
+      border-top: 1px solid var(--line);
+      margin-top: 6px;
+      padding-top: 12px
+    }
+
+    .steps {
+      display: flex;
+      justify-content: space-between;
+      margin: 16px 0
+    }
+
+    .st {
+      flex: 1;
+      text-align: center;
+      font-size: 12px;
+      color: var(--mute);
+      position: relative
+    }
+
+    .st i {
+      display: block;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--line);
+      margin: 0 auto 6px;
+      position: relative;
+      z-index: 1;
+      font-style: normal;
+      line-height: 26px;
+      color: #fff;
+      font-size: 14px
+    }
+
+    .st.done {
+      color: var(--g1);
+      font-weight: 600
+    }
+
+    .st.done i {
+      background: var(--g2)
+    }
+
+    .st:not(:first-child)::before {
+      content: "";
+      position: absolute;
+      top: 12px;
+      left: -50%;
+      width: 100%;
+      height: 2px;
+      background: var(--line)
+    }
+
+    .st.done:not(:first-child)::before {
+      background: var(--g2)
+    }
+
+    .map {
+      background: var(--g3);
+      border-radius: 16px;
+      height: 150px;
+      margin: 8px 0;
+      overflow: hidden
+    }
+
+    .toast {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--ink);
+      color: var(--bg);
+      padding: 10px 16px;
+      border-radius: 14px;
+      font-size: 14px;
+      z-index: 9
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--mute);
+      padding: 40px 10px
+    }
+
+    @media(prefers-reduced-motion:no-preference) {
+      .sheet>div {
+        animation: up .25s ease
+      }
+
+      @keyframes up {
+        from {
+          transform: translateY(40px);
+          opacity: .5
+        }
+      }
+    }
+
+    .srch {
+      margin-bottom: 10px
+    }
+
+    .row2 {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px
+    }
+
+    .row2 select {
+      padding: 10px
+    }
+
+    .tabs {
+      overflow-x: auto;
+      padding-bottom: 2px
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app"></div>
+  <script>
+    const D = [
+      [1, 'Плов по-ферганcки', '🍛', 'Дилноза', 'h', 'Второе', 38000, 45, 'Говядина, зира, морковь', 4.9],
+      [2, 'Лагман домашний', '🍜', 'Дилноза', 'h', 'Первое', 35000, 50, 'Ручная лапша, овощи', 4.8],
+      [3, 'Манты (6 шт.)', '🥟', 'Малика', 'h', 'Второе', 36000, 55, 'Мясо и тыква', 4.9],
+      [4, 'Мастава', '🍲', 'Малика', 'h', 'Первое', 30000, 40, 'Рис, овощи, катык', 4.7],
+      [5, 'Самса из тандыра', '🥐', 'Дилноза', 'h', 'Выпечка', 9000, 40, 'Мясо и лук, 1 шт.', 4.8],
+      [6, 'Салат «Ачичук»', '🥗', 'Азиза', 'h', 'Салат', 16000, 30, 'Томаты, лук, зелень', 4.6],
+      [7, 'Медовик (кусок)', '🍰', 'Азиза', 'h', 'Десерт', 22000, 60, 'Домашний, на сметане', 4.9],
+      [8, 'Бизнес-ланч «Классика»', '🍱', 'Bon Appétit Events', 'c', 'Второе', 45000, 60, 'Салат, суп, горячее', 4.7],
+      [9, 'Ланч-бокс «Веган»', '🥙', 'Green Lunch Box', 'c', 'Второе', 52000, 45, 'Хумус, овощи, киноа', 4.6],
+      [10, 'Шашлык микс', '🍢', 'Samarkand Catering', 'c', 'Второе', 65000, 70, 'Баранина, курица, люля', 4.8]];
+    const T = ['Все', 'Первое', 'Второе', 'Салат', 'Выпечка', 'Десерт'];
+    const PAY = [['payme', 'Payme'], ['click', 'Click'], ['card', 'Карта Uzcard / Humo'], ['cash', 'Наличными курьеру']];
+    const ST = ['Принят', 'Готовится', 'В пути', 'Доставлен'];
+    const S = { mode: 'office', addr: '', company: '', floor: '', view: 'home', cart: {}, orders: [], filter: 'all', sheet: false, toast: '', pay: 'payme', note: '', q: '', type: 'Все', maxp: 0, maxt: 0 };
+    const $ = s => document.querySelector(s);
+    const f = n => n.toLocaleString('ru-RU').replace(/,/g, ' ') + ' сум';
+    const dish = id => D.find(d => d[0] == id);
+    const cartN = () => Object.values(S.cart).reduce((a, b) => a + b, 0);
+    const cartT = () => Object.entries(S.cart).reduce((a, [i, q]) => a + q * dish(i)[6], 0);
+    const fee = () => S.mode == 'office' ? 0 : 8000;
+    function toast(m) { S.toast = m; draw(); setTimeout(() => { S.toast = ''; draw() }, 2000) }
+    function add(id, d) { S.cart[id] = Math.max(0, (S.cart[id] || 0) + d); if (!S.cart[id]) delete S.cart[id]; draw(true) }
+    function place() {
+      if (!S.addr || (S.mode == 'office' && !S.company)) return openSheet();
+      const ids = Object.keys(S.cart), first = dish(ids[0])[1];
+      const o = { id: 1001 + S.orders.length, title: first + (ids.length > 1 ? ' и ещё ' + (ids.length - 1) : ''), sum: cartT() + fee(), mode: S.mode, company: S.company, floor: S.floor, addr: S.addr, step: 0, n: cartN(), pay: PAY.find(p => p[0] == S.pay)[1] };
+      S.orders.unshift(o); S.cart = {}; S.view = 'orders'; S.filter = 'all'; draw();
+      const t = setInterval(() => { if (o.step < 3) { o.step++; draw(true) } else clearInterval(t) }, 6000)
+    }
+    function openSheet() { S.sheet = true; draw() }
+    function geo() {
+      const ok = a => { S.addr = a; draw() };
+      if (navigator.geolocation) navigator.geolocation.getCurrentPosition(p => ok('Моя геопозиция (' + p.coords.latitude.toFixed(3) + ', ' + p.coords.longitude.toFixed(3) + ')'), () => ok('Ташкент, Юнусабадский район')); else ok('Ташкент, Юнусабадский район')
+    }
+    function saveLoc() { S.addr = $('#ad').value.trim() || S.addr; if (S.mode == 'office') { S.company = $('#co').value.trim(); S.floor = $('#fl').value.trim() } S.sheet = false; draw() }
+    const go = v => { S.view = v; draw() };
+    function list() {
+      const q = S.q.toLowerCase(), r = D.filter(d => (S.type == 'Все' || d[5] == S.type) && (!S.maxp || d[6] <= S.maxp) && (!S.maxt || d[7] <= S.maxt) && (!q || (d[1] + d[3] + d[8]).toLowerCase().includes(q)));
+      if (!r.length) return `<div class="empty"><div style="font-size:44px">🔎</div><p>Ничего не найдено. Измените запрос или сбросьте фильтры.</p></div>`;
+      return r.map(d => {
+        const n = S.cart[d[0]] || 0; return `<div class="card"><div class="ava">${d[2]}</div><div style="flex:1"><h3>${d[1]}</h3><p>${d[8]}</p><p>${d[4] == 'h' ? 'Домашняя кухня' : 'Кейтеринг'}: ${d[3]} · ⭐ ${d[9]}</p><span class="tag">${f(d[6])} · ${d[7]} мин</span></div>
+ <div class="qty">${n ? `<button class="min" aria-label="Убрать" onclick="add(${d[0]},-1)">−</button><b>${n}</b>` : ''}<button aria-label="Добавить" onclick="add(${d[0]},1)">+</button></div></div>`
+      }).join('')
+    }
+    function draw(keep) {
+      const sc = keep && $('main') ? $('main').scrollTop : 0, off = S.mode == 'office';
+      let h = `<header><button class="loc" onclick="openSheet()"><span style="font-size:22px">📍</span><span><b>${S.addr || 'Укажите адрес доставки'}</b><small>${off ? (S.company ? 'Компания: ' + S.company + (S.floor ? ', ' + S.floor : '') : 'Укажите компанию для отслеживания') : 'Доставка для себя'}</small></span></button>
+ <div class="seg"><button class="${off ? 'on' : ''}" onclick="S.mode='office';draw()">Для офиса</button><button class="${!off ? 'on' : ''}" onclick="S.mode='me';draw()">Для себя</button></div></header><main>`;
+      if (S.view == 'home') {
+        h += `<h2>Обед на сегодня</h2><p class="sub">Домашняя еда и кейтеринг с доставкой ${off ? 'прямо в офис' : 'по вашему адресу'}.</p>
+  <input class="srch" type="search" placeholder="Найти блюдо или повара" value="${S.q}" oninput="S.q=this.value;$('#list').innerHTML=list()">
+  <div class="tabs">${T.map(t => `<button class="chip ${S.type == t ? 'on' : ''}" onclick="S.type='${t}';draw(true)">${t}</button>`).join('')}</div>
+  <div class="row2"><select aria-label="Цена" onchange="S.maxp=+this.value;draw(true)">${[[0, 'Любая цена'], [20000, 'до 20 000'], [40000, 'до 40 000'], [60000, 'до 60 000']].map(o => `<option value="${o[0]}" ${S.maxp == o[0] ? 'selected' : ''}>${o[1]}</option>`).join('')}</select>
+  <select aria-label="Время доставки" onchange="S.maxt=+this.value;draw(true)">${[[0, 'Любое время'], [40, 'до 40 мин'], [50, 'до 50 мин'], [60, 'до 60 мин']].map(o => `<option value="${o[0]}" ${S.maxt == o[0] ? 'selected' : ''}>${o[1]}</option>`).join('')}</select></div>
+  <div id="list">${list()}</div><div style="height:60px"></div>`
+      }
+      if (S.view == 'cart') {
+        if (!cartN()) h += `<div class="empty"><div style="font-size:48px">🛒</div><p>Корзина пуста. Добавьте блюда из каталога.</p></div><button class="btn" onclick="go('home')">Выбрать блюда</button>`;
+        else {
+          h += `<h2>Ваш заказ</h2><p class="sub">Можно взять блюда от разных поваров, доставим одним заказом.</p>`;
+          Object.entries(S.cart).forEach(([i, q]) => { const d = dish(i); h += `<div class="item"><div><b>${d[1]}</b><small>${d[3]} · ${f(d[6])}</small></div><div class="qty"><button class="min" onclick="add(${i},-1)">−</button><b>${q}</b><button onclick="add(${i},1)">+</button></div></div>` });
+          h += `<label>Адрес доставки</label><button class="card" style="margin:0" onclick="openSheet()"><span>📍</span><div><b>${S.addr || 'Укажите адрес'}</b>${off ? `<p>${S.company || 'Укажите компанию'}${S.floor ? ', ' + S.floor : ''}</p>` : ''}</div></button>
+   <label>Оплата онлайн</label><select onchange="S.pay=this.value">${PAY.map(p => `<option value="${p[0]}" ${S.pay == p[0] ? 'selected' : ''}>${p[1]}</option>`).join('')}</select>
+   <label>Комментарий курьеру</label><input placeholder="Этаж, ресепшн, время" value="${S.note}" onchange="S.note=this.value">
+   <div style="margin:16px 0"><div class="sum"><span>Блюда</span><span>${f(cartT())}</span></div><div class="sum"><span>Доставка</span><span>${fee() ? f(fee()) : 'Бесплатно в офис'}</span></div><div class="sum t"><span>Итого</span><span>${f(cartT() + fee())}</span></div></div>
+   <button class="btn" onclick="place()">${S.pay == 'cash' ? 'Оформить заказ' : 'Оплатить ' + f(cartT() + fee())}</button>`
+        }
+      }
+      if (S.view == 'orders') {
+        const cos = [...new Set(S.orders.filter(o => o.company).map(o => o.company))];
+        h += `<h2>Мои заказы</h2><p class="sub">Статус обновляется автоматически.</p>`;
+        if (cos.length) h += `<div class="tabs"><button class="chip ${S.filter == 'all' ? 'on' : ''}" onclick="S.filter='all';draw()">Все</button>${cos.map(c => `<button class="chip ${S.filter == c ? 'on' : ''}" onclick="S.filter=this.dataset.c;draw()" data-c="${c}">🏢 ${c}</button>`).join('')}</div>`;
+        const os = S.orders.filter(o => S.filter == 'all' || o.company == S.filter);
+        if (!os.length) h += `<div class="empty"><div style="font-size:48px">📦</div><p>Заказов пока нет. Оформите первый, и он появится здесь.</p></div>`;
+        os.forEach(o => {
+          h += `<div class="card" style="display:block"><div style="display:flex;gap:10px;align-items:center"><div class="ava">🍱</div><div style="flex:1"><h3>№${o.id} · ${o.title}</h3><p>${o.n} порц. · ${f(o.sum)} · ${o.pay}</p></div></div>
+   <span class="tag">${o.mode == 'office' ? '🏢 ' + o.company + (o.floor ? ', ' + o.floor : '') : 'Для себя'}</span>
+   <div class="steps">${ST.map((s, i) => `<div class="st ${i <= o.step ? 'done' : ''}"><i>${i <= o.step ? '✓' : ''}</i>${s}</div>`).join('')}</div>
+   <div class="map"><svg viewBox="0 0 300 150" width="100%" height="100%" aria-label="Карта доставки"><path d="M20 120 C90 120 90 40 160 60 S250 40 280 30" fill="none" stroke="#1fa354" stroke-width="3" stroke-dasharray="6 6"/><text x="270" y="28" font-size="22">📍</text><text x="10" y="128" font-size="20">🍳</text><circle cx="${[24, 90, 170, 272][o.step]}" cy="${[118, 95, 58, 32][o.step]}" r="8" fill="#0f7a3d"/></svg></div>
+   <p style="font-size:13px;color:var(--mute)">📍 ${o.addr}</p></div>`
+        })
+      }
+      h += `</main>`;
+      if (S.view == 'home' && cartN()) h += `<div class="bar"><button class="btn" onclick="go('cart')">Корзина · ${cartN()} шт. · ${f(cartT())}</button></div>`;
+      h += `<nav><button class="${S.view == 'home' ? 'on' : ''}" onclick="go('home')"><span>🍱</span>Меню</button><button class="${S.view == 'cart' ? 'on' : ''}" onclick="go('cart')"><span>🛒</span>Корзина${cartN() ? `<i class="dot">${cartN()}</i>` : ''}</button><button class="${S.view == 'orders' ? 'on' : ''}" onclick="go('orders')"><span>📦</span>Заказы${S.orders.length ? `<i class="dot">${S.orders.length}</i>` : ''}</button></nav>`;
+      if (S.sheet) h += `<div class="sheet" onclick="if(event.target==this){S.sheet=false;draw()}"><div><h2>Куда доставить?</h2>
+  <label>Адрес</label><input id="ad" value="${S.addr}" placeholder="Улица, дом, ориентир">
+  <button class="btn alt" style="margin-top:8px" onclick="geo()">📍 Определить моё местоположение</button>
+  ${off ? `<label>Название компании</label><input id="co" value="${S.company}" placeholder="Например: ООО «Технопарк»"><label>Этаж / офис</label><input id="fl" value="${S.floor}" placeholder="3 этаж, офис 12">` : ''}
+  <button class="btn" style="margin-top:16px" onclick="saveLoc()">Сохранить</button></div></div>`;
+      if (S.toast) h += `<div class="toast">${S.toast}</div>`;
+      $('#app').innerHTML = h; if (sc && $('main')) $('main').scrollTop = sc
+    }
+    draw();
+  </script>
+</body>
+
+</html>
